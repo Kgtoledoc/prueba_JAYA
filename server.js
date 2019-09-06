@@ -17,12 +17,14 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-app.use(express.static('./public'));
+app.use(express.static('./'));
 
 
 app.get('/', (req, res) => {
     res.send("Test JAYA")
 })
+
+app.get()
 
 
 
