@@ -7,6 +7,7 @@ const fs = require('fs');
 
 const Users = require('./models/Users');
 const port = 3000;
+
 const app = express();
 const SECRET_KEY = 'secretkey123456';
 
@@ -16,12 +17,16 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+app.use(express.static('./public'));
+
 
 app.get('/', (req, res) => {
     res.send("Test JAYA")
 })
 
- // Login
+
+
+// Login
 app.post('/login', (req, res) => {
 
     var username = req.body.username;
@@ -91,26 +96,29 @@ app.get('/asc', verifyToken, (req, res) => {
         if (err) {
             return res.sendStatus(403);
         }
-        else {            
-
-            fs.readFile('./assets/original.txt', function(err, data) {
-                if(err) throw err;
+        else {
+            fs.writeFile('./assets/sorted.txt', '', (err) => {
+                if (err) throw err;
+            })
+            fs.readFile('./assets/original.txt', function (err, data) {
+                if (err) throw err;
                 var array = data.toString().split(";\r\n");
                 array.pop();
-                for(i in array) {
-                    var newArray = array[i].split();
-                    
-                    console.log(newArray);
-                    
-                }   
+                for (i in array) {
+                    console.log(array[i])
+                    var newArray = JSON.parse(array[i]);
+                    var sortedArray = JSON.stringify(newArray.sort(function (a, b) { return a - b }));
+                    console.log(sortedArray)
+                    fs.writeFile('./assets/sorted.txt', sortedArray + ';\n', { flag: 'a+' }, (err) => {
+                        if (err) throw err;
+                        continue
+                    })
 
-                res.json({
-                    message: 'Access granted',
-                    array
-                })
+                }
+
+
             });
-
-              
+            res.send(' Open the file ./assets/sorted.txt');
         }
 
     })
@@ -123,28 +131,79 @@ app.get('/des', verifyToken, (req, res) => {
             return res.sendStatus(403);
         }
         else {
-            res.status(200).send({
-                message: 'Access granted',
-                authUser
+
+            fs.writeFile('./assets/sorted.txt', '', (err) => {
+                if (err) throw err;
+            })
+            fs.readFile('./assets/original.txt', function (err, data) {
+                if (err) throw err;
+                var array = data.toString().split(";\r\n");
+                array.pop();
+                for (i in array) {
+
+                    var newArray = JSON.parse(array[i]);
+                    var sortedArray = JSON.stringify(newArray.sort(function (a, b) { return b - a }));
+                    console.log(sortedArray)
+                    fs.writeFile('./assets/output.txt', sortedArray + ';\n', { flag: 'a+' }, (err) => {
+                        if (err) throw err;
+                        continue
+
+                    })
+
+                }
+
+
             });
+            res.send('Open the file ./assets/sorted.txt');
         }
 
     })
 
 
 })
+// MIx 
 app.get('/mix', verifyToken, (req, res) => {
     jwt.verify(req.token, SECRET_KEY, (err, authUser) => {
-        if(err){
+        if (err) {
             return res.sendStatus(403);
         }
         else {
-            res.json({
-                message: 'Access granted',
-                authUser
+
+            console.log("Enter")
+
+            fs.writeFile('./assets/output.txt', '', (err) => {
+                if (err) throw err;
             })
+            fs.readFile('./assets/original.txt', function (err, data) {
+                if (err) throw err;
+                var array = data.toString().split(";\r\n");
+                array.pop();
+                for (i in array) {
+
+                    if (i % 2 == 0) {
+                        var newArray = JSON.parse(array[i]);
+                        var sortedArray = JSON.stringify(newArray.sort(function (a, b) { return a - b }));
+                        console.log(sortedArray)
+                        fs.writeFile('./assets/output.txt', sortedArray + ';\n', { flag: 'a+' }, (cb) => {
+                        })
+                        continue
+
+                    } else {
+                        var newArray = JSON.parse(array[i]);
+                        var sortedArray = JSON.stringify(newArray.sort(function (a, b) { return b - a }));
+                        console.log(sortedArray)
+                        fs.writeFile('./assets/output.txt', sortedArray + ';\n', { flag: 'a+' }, (cb) => {
+                        })
+                        continue
+                    }
+
+
+                }
+
+            });
+            res.send('Open the file ./assets/sorted.txt');
         }
-        
+
     })
 })
 
