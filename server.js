@@ -24,9 +24,6 @@ app.get('/', (req, res) => {
     res.send("Test JAYA")
 })
 
-app.get()
-
-
 
 // Login
 app.post('/login', (req, res) => {
